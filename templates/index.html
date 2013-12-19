@@ -2,6 +2,10 @@
 
 Hello {{ name }}!
 
+{% for user in users %}
+{{ user.name }}
+{% endfor %}
+
 {% if name == 'Fabien' %}
 test
 {% else %}
@@ -16,10 +20,9 @@ test
 <div>{{ param.user_id }}</div>
 <div>{{ dump(_seq) }}</div>
 <div></div>
+{% endarticle %}
 
-{% for user in users %}
-{{ user.name }}
-{% endfor %}
+
 
 
 <br>

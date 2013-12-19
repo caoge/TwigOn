@@ -10,17 +10,23 @@ class Project_Article_TokenParser extends Twig_TokenParser {
         $stream = $parser->getStream();
         $param = array();
         
-
+//var_dump($stream);
         //var_dump($parser->getStream());exit;
         
         $service = $stream->expect(Twig_Token::NAME_TYPE, 'service')->getValue();
-        $stream->expect(Twig_Token::OPERATOR_TYPE, '=')->getValue();
+        $b = $stream->expect(Twig_Token::OPERATOR_TYPE, '=')->getValue();
         $service1 = $parser->getExpressionParser()->parseExpression();
 
 
         $param = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
         $stream->expect(Twig_Token::OPERATOR_TYPE, '=');
         $param_value = $parser->getExpressionParser()->parseExpression();
+
+
+        // while (!$token->test(Twig_Token::BLOCK_END_TYPE, 'endarticle')) {
+        //     var_dump(2);
+        // }
+
 
         //$body = $this->parser->subparse(array($this, 'decideForEnd'));
         // 数据类型参数
@@ -31,6 +37,24 @@ class Project_Article_TokenParser extends Twig_TokenParser {
         }
         
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
+        $parser->subparse(array($this, 'decideArticleEnd'), true);
+        $stream->expect(Twig_Token::BLOCK_END_TYPE);
+
+        //var_dump($stream->expect(Twig_Token::NAME_TYPE)->getValue());exit;
+        // $body = $parser->subparse(array($this, 'decideArticleEnd'));
+        // if ($stream->next()->getValue() == 'endarticle') {
+
+        //     //var_dump($stream->expect(Twig_Token::BLOCK_END_TYPE));exit;
+        //     $stream->expect(Twig_Token::BLOCK_END_TYPE);
+
+        //     $else = $parser->subparse(array($this, 'decideArticleEnd'), true);
+        //     //var_dump($else);exit;
+        // } else {
+        //     $else = null;
+        // }
+       //var_dump($token->test('endarticle'));exit;
+
+        //$stream->expect(Twig_Token::BLOCK_END_TYPE);
         //$end = $this->parser->subparse(array($this, 'decideForEnd'), true);
 
         //var_dump($stream);exit;
@@ -41,6 +65,10 @@ class Project_Article_TokenParser extends Twig_TokenParser {
     // {
     //     return $token->test('endarticle');
     // }
+
+    public function decideArticleEnd(Twig_Token $token){
+        return $token->test('endarticle');
+    }
 
     public function getTag() {
         return 'article';
