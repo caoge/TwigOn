@@ -6,11 +6,14 @@ $twig->addExtension(new Twig_Extension_Debug());
 // 扩展TAG，文章列表
 class Project_Article_TokenParser extends Twig_TokenParser {
 	public function parse(Twig_Token $token) {
+        $lineno = $token->getLine();
         $parser = $this->parser;
         $stream = $parser->getStream();
+        //$targets = $parser->getExpressionParser()->parseAssignmentExpression();
+        //var_dump($targets);exit;
         $param = array();
         
-//var_dump($stream);
+        //var_dump($stream);
         //var_dump($parser->getStream());exit;
         
         $service = $stream->expect(Twig_Token::NAME_TYPE, 'service')->getValue();
@@ -35,11 +38,16 @@ class Project_Article_TokenParser extends Twig_TokenParser {
             $stream->expect(Twig_Token::OPERATOR_TYPE, '=');
             $sort_value = $parser->getExpressionParser()->parseExpression();
         }
-        
-        $stream->expect(Twig_Token::BLOCK_END_TYPE);
-        $parser->subparse(array($this, 'decideArticleEnd'), true);
-        $stream->expect(Twig_Token::BLOCK_END_TYPE);
 
+        $stream->expect(Twig_Token::BLOCK_END_TYPE);
+        $body = $parser->subparse(array($this, 'decideArticleEnd'), true);
+        $stream->expect(Twig_Token::BLOCK_END_TYPE);
+        //$body = $parser->subparse(array($this, 'decideArticleEnd'));
+//var_dump($body);
+        $keyTarget = new Twig_Node_Expression_AssignName('_key', $lineno);
+        $valueTarget = new Twig_Node_Expression_AssignName('_field', $lineno);
+
+        //var_dump($keyTarget);
         //var_dump($stream->expect(Twig_Token::NAME_TYPE)->getValue());exit;
         // $body = $parser->subparse(array($this, 'decideArticleEnd'));
         // if ($stream->next()->getValue() == 'endarticle') {
@@ -58,7 +66,8 @@ class Project_Article_TokenParser extends Twig_TokenParser {
         //$end = $this->parser->subparse(array($this, 'decideForEnd'), true);
 
         //var_dump($stream);exit;
-        return new Project_Article_Node($param, $param_value, $token->getLine(), $this->getTag());
+
+        return new Project_Article_Node($keyTarget, $valueTarget, $body, $param, $param_value, $token->getLine(), $this->getTag());
     }
 
     // public function decideForEnd(Twig_Token $token)
@@ -86,9 +95,13 @@ class Project_Clist_TokenParser extends Twig_TokenParser {
 
 // 转成PHP代码
 class Project_Article_Node extends Twig_Node {
-	public function __construct($param, Twig_Node_Expression $param_value, $line, $tag = null) {
-		parent::__construct(array('param_value' => $param_value), 
-			array('param' => $param), $line, $tag);
+	public function __construct(Twig_Node_Expression_AssignName $keyTarget, Twig_Node_Expression_AssignName $valueTarget, Twig_NodeInterface $body, $param, Twig_Node_Expression $param_value, $lineno, $tag = null) {
+        $body = new Twig_Node(array($body, $this->loop = new Twig_Node_ForLoop($lineno, $tag)));
+        
+
+        parent::__construct(array('key_target' => $keyTarget, 'value_target' => $valueTarget, 'body' => $body), array('with_loop' => true), $lineno, $tag);
+
+		//parent::__construct(array('param_value' => $param_value), array('param' => $param), $lineno, $tag);
 	}
 
 	public function compile(Twig_Compiler $compiler) {
@@ -99,21 +112,23 @@ class Project_Article_Node extends Twig_Node {
         $a = 1;
         $compiler
             ->addDebugInfo($this)
-            ->write("\$context['_seq'] = 'dsfsf'")
+            ->write("\$context['_seq'] = array('dsfsf')")
             ->raw(";\n")
         ;
-        //var_dump(1);exit;
-        // $compiler
-        //     ->write("foreach (\$context['_seq'] as ")
-        //     ->subcompile($this->getNode('key_target'))
-        //     ->raw(" => ")
-        //     ->subcompile($this->getNode('value_target'))
-        //     ->raw(") {\n")
-        //     ->indent()
-        //     ->subcompile($this->getNode('body'))
-        //     ->outdent()
-        //     ->write("}\n")
-        // ;
+
+
+        //var_dump($this->getNode('body'));exit;
+        $compiler
+            ->write("foreach (\$context['_seq'] as ")
+            ->subcompile($this->getNode('key_target'))
+            ->raw(" => ")
+            ->subcompile($this->getNode('value_target'))
+            ->raw(") {\n")
+            ->indent()
+            ->subcompile($this->getNode('body'))
+            ->outdent()
+            ->write("}\n")
+        ;
         // $compiler
         //     ->addDebugInfo($this)
         //     ->write('$context[\''.$this->getAttribute('param').'\'] = ')

@@ -1,11 +1,11 @@
 {% include 'head.html' %}
 
 Hello {{ name }}!
-
+<div></div>
 {% for user in users %}
 {{ user.name }}
 {% endfor %}
-
+<div></div>
 {% if name == 'Fabien' %}
 test
 {% else %}
@@ -17,9 +17,8 @@ test
 <div>文章列表</div>
 <!-- 取文章列表 -->
 {% article service = "USER.INFO.GET" param={user_id:name, user_name:"caoge", login_time: {exp: "gt", val: "23"}} data_type = "json" %}
-<div>{{ param.user_id }}</div>
 <div>{{ dump(_seq) }}</div>
-<div></div>
+<div>{{ _field }}</div>
 {% endarticle %}
 
 
@@ -30,4 +29,5 @@ test
 {{ user }}
 <script type="text/javascript">
 var a = '{{ random('ABCDEFGHIJKLMN') }}';
+
 </script>
