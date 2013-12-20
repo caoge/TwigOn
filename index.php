@@ -98,7 +98,6 @@ class Project_Article_Node extends Twig_Node {
 	public function __construct(Twig_Node_Expression_AssignName $keyTarget, Twig_Node_Expression_AssignName $valueTarget, Twig_NodeInterface $body, $param, Twig_Node_Expression $param_value, $lineno, $tag = null) {
         $body = new Twig_Node(array($body, $this->loop = new Twig_Node_ForLoop($lineno, $tag)));
         
-
         parent::__construct(array('key_target' => $keyTarget, 'value_target' => $valueTarget, 'body' => $body), array('with_loop' => true), $lineno, $tag);
 
 		//parent::__construct(array('param_value' => $param_value), array('param' => $param), $lineno, $tag);
