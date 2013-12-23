@@ -42,10 +42,13 @@ class Project_Article_TokenParser extends Twig_TokenParser {
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
         $body = $parser->subparse(array($this, 'decideArticleEnd'), true);
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
-        //$body = $parser->subparse(array($this, 'decideArticleEnd'));
-//var_dump($body);
+
+
         $keyTarget = new Twig_Node_Expression_AssignName('_key', $lineno);
         $valueTarget = new Twig_Node_Expression_AssignName('_field', $lineno);
+
+
+        //$aaa = new Twig_Node_Expression_AssignName('aaa', $lineno);
 
         //var_dump($keyTarget);
         //var_dump($stream->expect(Twig_Token::NAME_TYPE)->getValue());exit;
@@ -97,7 +100,7 @@ class Project_Clist_TokenParser extends Twig_TokenParser {
 class Project_Article_Node extends Twig_Node {
 	public function __construct(Twig_Node_Expression_AssignName $keyTarget, Twig_Node_Expression_AssignName $valueTarget, Twig_NodeInterface $body, $param, Twig_Node_Expression $param_value, $lineno, $tag = null) {
         $body = new Twig_Node(array($body, $this->loop = new Twig_Node_ForLoop($lineno, $tag)));
-        
+
         parent::__construct(array('key_target' => $keyTarget, 'value_target' => $valueTarget, 'body' => $body), array('with_loop' => true), $lineno, $tag);
 
 		//parent::__construct(array('param_value' => $param_value), array('param' => $param), $lineno, $tag);
@@ -108,17 +111,20 @@ class Project_Article_Node extends Twig_Node {
             array('id' => 1, 'name' => 'a'),
             array('id' => 2, 'name' => 'b')
         );
-        $a = 1;
+        $a = json_encode(array('caoge', 'bbb'));
+        //var_dump($a);
+        //var_dump(json_decode('["caoge","bbb"]'));
         $compiler
             ->addDebugInfo($this)
-            ->write("\$context['_seq'] = array('dsfsf')")
+            ->write("\$context['_seq'] = array(11);")
+            ->write("\$context['json'] = json_decode('".$a."');")
             ->raw(";\n")
         ;
 
 
         //var_dump($this->getNode('body'));exit;
         $compiler
-            ->write("foreach (\$context['_seq'] as ")
+            ->write("foreach (\$context['json'] as ")
             ->subcompile($this->getNode('key_target'))
             ->raw(" => ")
             ->subcompile($this->getNode('value_target'))
