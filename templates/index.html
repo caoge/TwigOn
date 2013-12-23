@@ -17,10 +17,11 @@ test
 <div>文章列表</div>
 
 {% article service = "USER.INFO.GET" param = {user_id:name, user_name:"caoge", login_time: {exp: "gt", val: "23"}} data_type = "json" %}
-<div>{{ dump(_seq) }}</div>
-<div>{{ _field }}</div>
+{{ dump(param) }}
+<!-- <div>{{ dump(json) }}</div>
+<div>{{ _key }}</div>
+<div>{{ _field[0] }}</div> -->
 {% endarticle %}
-
 
 <br>
 {% set user = "admin" %}
